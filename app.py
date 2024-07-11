@@ -95,25 +95,21 @@ def search_flights_route():
     data = request.json
     print("Received data:", data)  # Log the received data
 
-    sourceAirportCode = data.get('sourceAirportCode')
-    destinationAirportCode = data.get('destinationAirportCode')
-    date = data.get('date')
-    returnDate = data.get('returnDate')
-    itineraryType = data.get('itineraryType')
-    sortOrder = data.get('sortOrder')
-    numAdults = data.get('numAdults')
-    numSeniors = data.get('numSeniors')
-    classOfService = data.get('classOfService')
-
-    if not all([sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService]):
-        return jsonify({'error': 'All fields are required.'}), 400
-
     try:
-        flights = search_flights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService)
-        return jsonify(flights)
+        result = search_flights(
+            data['sourceAirportCode'],
+            data['destinationAirportCode'],
+            data['date'],
+            data['returnDate'],
+            data['itineraryType'],
+            data['sortOrder'],
+            data['numAdults'],
+            data['numSeniors'],
+            data['classOfService']
+        )
+        return jsonify(result), 200
     except Exception as e:
-        print("Error occurred:", e)  # Log the error
-        return str(e), 500
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(port=3002)

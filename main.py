@@ -32,9 +32,20 @@ def search_flights(sourceAirportCode, destinationAirportCode, date, returnDate, 
     print("Response status code:", response.status_code)
     print("Response text:", response.text)
 
+
     if response.status_code == 200:
-        json_data = response.json()
-        return json_data.get('data', {}).get('flights', [])
+            json_data = response.json()
+            flights = json_data.get('data', {}).get('flights', [])
+            
+            purchase_links = []
+            for flight in flights:
+                for link in flight.get('purchaseLinks', []):
+                    purchase_links.append({
+                        'providerId': link['providerId'],
+                        'totalPrice': link['totalPrice'],
+                        'url': link['url']
+                    })
+            
+            return purchase_links
     else:
         raise Exception(f"Error: {response.status_code} - {response.text}")
-
