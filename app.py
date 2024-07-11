@@ -4,7 +4,6 @@ from models import User, db
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 import os
-import uuid
 
 load_dotenv()
 
@@ -14,10 +13,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///flaskdb.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')  # Ensure this key is strong and secure
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret_key') #gonna make this
 
-# Enable CORS for requests including credentials
-CORS(app, supports_credentials=True)
+CORS(app)
 
 bcrypt = Bcrypt(app)
 db.init_app(app)
@@ -25,14 +23,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# Check if user is logged in
-@app.route('/check_session', methods=['GET'])
-def check_session():
-    if 'user_id' in session:
-        return jsonify({'status': 'logged in'})
-    return jsonify({'status': 'not logged in'})
-
-@app.route('/registration', methods=['POST'])
+@app.route("/registration", methods=['POST'])
 def signup():
     email = request.json.get('email')
     password = request.json.get('password')
@@ -66,28 +57,17 @@ def login_user():
 
     user = User.query.filter_by(email=email).first()
 
-    if user is None or not bcrypt.check_password_hash(user.password, password):
+    if user is None:
+        return jsonify({'error': 'Unauthorized access'}), 401
+    if not bcrypt.check_password_hash(user.password, password):
         return jsonify({'error': 'Unauthorized'}), 401
 
     session['user_id'] = user.id
+
     return jsonify({
         'id': user.id,
         'email': email
     })
 
-@app.route('/logout', methods=['POST'])
-def logout_user():
-    session.clear()
-    return jsonify({'message': 'Logged out successfully'})
-
-@app.route('/profile', methods=['GET'])
-def profile():
-    user_id = session.get('user_id')
-    if user_id:
-        user = User.query.get(user_id)
-        if user:
-            return jsonify({'email': user.email}), 200
-    return jsonify({'error': 'User not logged in'}), 401
-
 if __name__ == '__main__':
-    app.run(port=3002)
+    app.run(port=3001)
