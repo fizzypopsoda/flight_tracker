@@ -3,6 +3,7 @@ from flask_cors import CORS
 from models import User, db
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
+from main import searchFlights
 import os
 import uuid
 
@@ -88,6 +89,29 @@ def profile():
         if user:
             return jsonify({'email': user.email}), 200
     return jsonify({'error': 'User not logged in'}), 401
+
+@app.route('/search', methods=['POST'])
+def search_flights_route():
+    data = request.json
+
+    sourceAirportCode = data.get('sourceAirportCode')
+    destinationAirportCode = data.get('destinationAirportCode')
+    date = data.get('date')
+    returnDate = data.get('returnDate')
+    itineraryType = data.get('itineraryType')
+    sortOrder = data.get('sortOrder')
+    numAdults = data.get('numAdults')
+    numSeniors = data.get('numSeniors')
+    classOfService = data.get('classOfService')
+
+    if not all([sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService]):
+        return jsonify({'error': 'All fields are required.'}), 400
+
+    try:
+        flights = searchFlights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService)
+        return jsonify(flights)
+    except Exception as e:
+        return str(e), 500
 
 if __name__ == '__main__':
     app.run(port=3002)

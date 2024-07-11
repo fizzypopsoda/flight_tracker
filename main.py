@@ -1,6 +1,6 @@
 import requests
 
-def main():
+def searchFlights():
     # Collect user inputs
     sourceAirportCode = input("Enter sourceAirportCode (e.g., BOS): ")
     destinationAirportCode = input("Enter destinationAirportCode (e.g., JFK): ")
@@ -45,4 +45,4 @@ def main():
         print("Error:", response.status_code, response.text)
 
 if __name__ == "__main__":
-    main()
+    searchFlights()
