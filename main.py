@@ -1,17 +1,10 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-def searchFlights():
-    # Collect user inputs
-    sourceAirportCode = input("Enter sourceAirportCode (e.g., BOS): ")
-    destinationAirportCode = input("Enter destinationAirportCode (e.g., JFK): ")
-    date = input("Enter travel date (YYYY-MM-DD): ")
-    returnDate = input("Enter return date (YYYY-MM-DD): ")
-    itineraryType = input("Enter itineraryType (ONE_WAY or ROUND_TRIP): ")
-    sortOrder = input("Enter sortOrder (e.g., PRICE): ")
-    numAdults = input("Enter number of adults (e.g., 1): ")
-    numSeniors = input("Enter number of seniors (e.g., 0): ")
-    classOfService = input("Enter class of service (e.g., ECONOMY): ")
+load_dotenv()  # Load environment variables from .env file
 
+def search_flights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
 
     querystring = {
@@ -27,22 +20,21 @@ def searchFlights():
     }
 
     headers = {
-        "x-rapidapi-key": "bba200fd56mshe960f0b2d77da71p110687jsnd7a81dfd6206",
+        "x-rapidapi-key": os.getenv('RAPIDAPI_KEY'),
         "x-rapidapi-host": "tripadvisor16.p.rapidapi.com"
     }
 
+    print("Making request to TripAdvisor API with the following parameters:")
+    print(querystring)
+
     response = requests.get(url, headers=headers, params=querystring)
 
-    # Check if the response is successful
+    print("Response status code:", response.status_code)
+    print("Response text:", response.text)
+
     if response.status_code == 200:
         json_data = response.json()
-        flights = json_data['data']['flights']
-        
-        # Print flight details
-        for flight in flights:
-            print(flight)
+        return json_data.get('data', {}).get('flights', [])
     else:
-        print("Error:", response.status_code, response.text)
+        raise Exception(f"Error: {response.status_code} - {response.text}")
 
-if __name__ == "__main__":
-    searchFlights()

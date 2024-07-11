@@ -1,11 +1,11 @@
+import os
+import requests
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from models import User, db
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
-from main import searchFlights
-import os
-import uuid
+from main import search_flights  # Import the updated search_flights function
 
 load_dotenv()
 
@@ -90,9 +90,10 @@ def profile():
             return jsonify({'email': user.email}), 200
     return jsonify({'error': 'User not logged in'}), 401
 
-@app.route('/search', methods=['POST'])
+@app.route('/searchFlights', methods=['POST'])
 def search_flights_route():
     data = request.json
+    print("Received data:", data)  # Log the received data
 
     sourceAirportCode = data.get('sourceAirportCode')
     destinationAirportCode = data.get('destinationAirportCode')
@@ -108,9 +109,10 @@ def search_flights_route():
         return jsonify({'error': 'All fields are required.'}), 400
 
     try:
-        flights = searchFlights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService)
+        flights = search_flights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService)
         return jsonify(flights)
     except Exception as e:
+        print("Error occurred:", e)  # Log the error
         return str(e), 500
 
 if __name__ == '__main__':
