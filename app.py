@@ -18,7 +18,6 @@ app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Ensure CORS is configured with the correct React origin
 CORS(app, supports_credentials=True, resources={r"*": {"origins": "http://localhost:3000"}})
 
 bcrypt = Bcrypt(app)
@@ -27,12 +26,6 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# @app.route('/check_session', methods=['GET'])
-# def check_session():
-#     print(f'Session data: {session}')
-#     if 'user_id' in session:
-#         return jsonify({'status': 'logged in'})
-#     return jsonify({'status': 'logged in'})
 
 @app.route('/check_session', methods=['GET'])
 def check_session():
@@ -64,22 +57,6 @@ def signup():
         'email': new_user.email
     })
 
-# @app.route('/login', methods=['POST'])
-# def login_user():
-#     email = request.json.get('email')
-#     password = request.json.get('password')
-#
-#     if not email or not password:
-#         return jsonify({'error': 'Email and password are required.'}), 400
-#
-#     user = User.query.filter_by(email=email).first()
-#
-#     if user is None or not bcrypt.check_password_hash(user.password, password):
-#         return jsonify({'error': 'Unauthorized'}), 401
-#
-#     session['user_id'] = user.id
-#     print(f'Session data after login: {session}')  # Debugging statement
-#     return jsonify({'status': 'success', 'message': 'Logged in successfully'})
 
 @app.route('/login', methods=['POST'])
 def login_user():
@@ -115,28 +92,6 @@ def profile():
             return jsonify({'email': user.email}), 200
     return jsonify({'error': 'User not logged in'}), 401
 
-# @app.route('/search', methods=['POST'])
-# def search_flights_route():
-#     data = request.json
-#
-#     sourceAirportCode = data.get('sourceAirportCode')
-#     destinationAirportCode = data.get('destinationAirportCode')
-#     date = data.get('date')
-#     returnDate = data.get('returnDate')
-#     itineraryType = data.get('itineraryType')
-#     sortOrder = data.get('sortOrder')
-#     numAdults = data.get('numAdults')
-#     numSeniors = data.get('numSeniors')
-#     classOfService = data.get('classOfService')
-#
-#     if not all([sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService]):
-#         return jsonify({'error': 'All fields are required.'}), 400
-#
-#     try:
-#         flights = searchFlights(sourceAirportCode, destinationAirportCode, date, returnDate, itineraryType, sortOrder, numAdults, numSeniors, classOfService)
-#         return jsonify(flights)
-#     except Exception as e:
-#         return str(e), 500
 
 
 @app.route('/searchFlights', methods=['POST'])
